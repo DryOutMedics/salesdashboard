@@ -173,6 +173,12 @@ body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%;
           <label>Google Sheet ID</label>
           <input type="text" id="sheetIdInput" value="">
         </div>
+          <div class="admin-field" style="margin-top:14px;">
+            <label>GitHub Token (photo sync)</label>
+            <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">A GitHub Personal Access Token with <strong>repo</strong> scope syncs photos to all devices. <a href="https://github.com/settings/tokens/new?scopes=repo&description=DryOutMedics+Photos" target="_blank" style="color:var(--accent2);">Create one &#8599;</a></p>
+            <input type="password" id="githubPATInput" placeholder="ghp_xxxxxxxxxxxx" style="font-family:monospace;width:100%;box-sizing:border-box;">
+            <p id="photoSyncStatus" style="font-size:0.8rem;margin-top:6px;color:var(--accent2);min-height:1.2em;"></p>
+          </div>
         <p style="font-size:0.75rem;color:var(--text-dim);margin-top:-8px;">The sheet must be published to web (File &rarr; Share &rarr; Publish to web) and shared with "Anyone with the link" for live data.</p>
       </div>
       <button class="admin-save" onclick="saveAdminSettings()">Save Settings</button>
@@ -207,7 +213,7 @@ body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%;
   </div>
   <div class="summary-row" id="summaryRow"></div>
   <div class="teams-grid" id="teamsGrid"></div>
-  <div class="footer">Live data from Google Sheets &middot; Photos saved in browser &middot; Auto-refreshes when enabled</div>
+  <div class="footer">Live data from Google Sheets &middot; Photos synced via GitHub &middot; Auto-refreshes when enabled</div>
 </div>
 <script>
 // ═══════════════════════════════ CONFIG & STATE ═══════════════════════════════
@@ -235,12 +241,29 @@ const COLORS = [
   'linear-gradient(135deg, #ff9ff3, #f368e0)','linear-gradient(135deg, #54a0ff, #2e86de)',
 ];
 
+// ═══════════════════════════════ PHOTO CONFIG ═══════════════════
+const GITHUB_OWNER = 'waltha5';
+const GITHUB_REPO = 'DryoutMedics';
+const PHOTOS_JSON_PATH = 'photos.json';
+
 // ═══════════════════════════════ HOUSE ACCOUNT ═══════════════════════════════
 function isHouseAccount(name) {
   return name.toLowerCase().includes('house');
 }
 
 // ═══════════════════════════════ LOCAL STORAGE ═══════════════════════════════
+let githubPAT = '';
+async function loadRemotePhotos() {
+  try {
+    const url = 'https://raw.githubusercontent.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/main/' + PHOTOS_JSON_PATH + '?t=' + Date.now();
+    const resp = await fetch(url);
+    if (resp.ok) {
+      const remote = await resp.json();
+      photoStore = remote;
+    }
+  } catch(e) {}
+  if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam);
+}
 function loadSettings() {
   try {
     const s = localStorage.getItem('lb_settings');
@@ -249,18 +272,35 @@ function loadSettings() {
       if (o.sheetId) SPREADSHEET_ID = o.sheetId;
       if (o.password) adminPassword = o.password;
       if (o.refreshInterval !== undefined) autoRefreshSec = o.refreshInterval;
+      if (o.githubPAT) githubPAT = o.githubPAT;
     }
-    const p = localStorage.getItem('lb_photos');
-    if (p) photoStore = JSON.parse(p);
   } catch(e) {}
 }
 function saveSettings() {
   try {
-    localStorage.setItem('lb_settings', JSON.stringify({ sheetId: SPREADSHEET_ID, password: adminPassword, refreshInterval: autoRefreshSec }));
+    localStorage.setItem('lb_settings', JSON.stringify({ sheetId: SPREADSHEET_ID, password: adminPassword, refreshInterval: autoRefreshSec, githubPAT }));
   } catch(e) {}
 }
-function savePhotos() {
-  try { localStorage.setItem('lb_photos', JSON.stringify(photoStore)); } catch(e) {}
+async function savePhotos() {
+  if (!githubPAT) { console.warn('No GitHub PAT'); return; }
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(photoStore, null, 2))));
+    let sha = '';
+    try {
+      const check = await fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + PHOTOS_JSON_PATH, {
+        headers: { 'Authorization': 'token ' + githubPAT, 'Accept': 'application/vnd.github.v3+json' }
+      });
+      if (check.ok) { const d = await check.json(); sha = d.sha; }
+    } catch(e) {}
+    const body = { message: 'Update team photos', content };
+    if (sha) body.sha = sha;
+    const result = await fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + PHOTOS_JSON_PATH, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + githubPAT, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!result.ok) throw new Error('GitHub API ' + result.status);
+  } catch(e) { console.warn('Photo sync failed:', e.message); throw e; }
 }
 
 // ═══════════════════════════════ GOOGLE SHEETS API ═══════════════════════════
@@ -493,9 +533,28 @@ document.getElementById('photoInput').addEventListener('change', function(e) {
       const w = img.width*scale, h = img.height*scale;
       ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
       photoStore[currentPhotoTarget] = canvas.toDataURL('image/jpeg', 0.85);
-      savePhotos();
-      if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam);
-      renderPhotoGrid();
+      const _m = document.createElement('div');
+      _m.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;color:var(--accent2);font-size:0.85rem;z-index:9999;';
+      _m.textContent = githubPAT ? '⏫ Syncing photo to GitHub...' : '⚠️ No GitHub token – add one in Admin to sync photos to all devices.';
+      document.body.appendChild(_m);
+      if (githubPAT) {
+        savePhotos().then(() => {
+          if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam);
+          renderPhotoGrid();
+          _m.textContent = '✅ Photo synced! Visible on all devices now.';
+          setTimeout(() => _m.remove(), 3500);
+        }).catch(() => {
+          _m.style.color = 'var(--accent1)';
+          _m.textContent = '❌ Sync failed – check your GitHub token in Admin settings.';
+          setTimeout(() => _m.remove(), 4000);
+          if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam);
+          renderPhotoGrid();
+        });
+      } else {
+        if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam);
+        renderPhotoGrid();
+        setTimeout(() => _m.remove(), 5000);
+      }
     };
     img.src = ev.target.result;
   };
@@ -511,6 +570,9 @@ function openAdmin() {
     document.getElementById('adminPanel').style.display = 'block';
     document.getElementById('sheetIdInput').value = SPREADSHEET_ID;
     document.getElementById('refreshInterval').value = autoRefreshSec;
+    document.getElementById('githubPATInput').value = githubPAT;
+    const _ss = document.getElementById('photoSyncStatus');
+    if (_ss) _ss.textContent = githubPAT ? '✅ Token set – photos sync to all devices.' : '⚠️ No token – photos only save locally.';
     renderPhotoGrid();
   } else {
     document.getElementById('adminLogin').style.display = 'block';
@@ -547,6 +609,8 @@ function saveAdminSettings() {
   if (newId) SPREADSHEET_ID = newId;
   autoRefreshSec = newInterval;
   if (newPass) adminPassword = newPass;
+  const _pat = document.getElementById('githubPATInput').value.trim();
+  githubPAT = _pat;
   saveSettings();
   startAutoRefresh();
   closeAdmin();
@@ -571,9 +635,12 @@ function renderPhotoGrid() {
 }
 function removePhoto(pk) {
   delete photoStore[pk];
-  savePhotos();
-  renderPhotoGrid();
-  if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam);
+  if (githubPAT) {
+    savePhotos().then(() => { renderPhotoGrid(); if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam); }).catch(() => { renderPhotoGrid(); if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam); });
+  } else {
+    renderPhotoGrid();
+    if (currentData) renderTeams(currentData.bdrTeam, currentData.pmTeam);
+  }
 }
 
 
@@ -624,6 +691,7 @@ Object.values(FALLBACK_DATA).forEach(d => { d.bdrTeam.forEach(m => allPeople.add
 // ═══════════════════════════════ MAIN ════════════════════════════════════════
 async function init(skipLoading) {
   if (!skipLoading) loadSettings();
+  loadRemotePhotos();
   let useFallback = false;
   try {
     const tabs = await fetchSheetTabs();
