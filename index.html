@@ -44,6 +44,11 @@ body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%;
 .summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 36px; }
 .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; transition: transform 0.2s; }
 .summary-card:hover { transform: translateY(-3px); }
+.summary-card.hidden-card { opacity: 0.25; }
+.summary-card.hidden-card .value { filter: blur(6px); user-select: none; }
+.summary-card { position: relative; }
+.summary-card .toggle-eye { position: absolute; top: 6px; right: 8px; font-size: 0.8rem; cursor: pointer; opacity: 0; transition: opacity 0.2s; background: none; border: none; color: var(--text-dim); padding: 2px 4px; border-radius: 4px; line-height: 1; }
+.summary-card:hover .toggle-eye { opacity: 1; }
 .summary-card .value { font-size: 2rem; font-weight: 900; }
 .summary-card .label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-top: 4px; }
 .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 24px; }
@@ -218,6 +223,7 @@ let countdownVal = 0;
 let sheetTabs = [];
 let currentData = null;
 let photoStore = {};
+let hiddenCards = new Set(JSON.parse(localStorage.getItem('lb_hidden_cards') || '[]'));
 let allPeople = new Set();
 let isLive = false;
 const COLORS = [
@@ -369,21 +375,37 @@ function getInitials(n) { return n.split(/[\s,]+/).filter(Boolean).map(w => w[0]
 function getColor(n) { let h=0; for(let i=0;i<n.length;i++) h=n.charCodeAt(i)+((h<<5)-h); return COLORS[Math.abs(h)%COLORS.length]; }
 function photoKey(name) { return name.toLowerCase().replace(/\s+/g,'_'); }
 
+function toggleCard(id) {
+  if (hiddenCards.has(id)) {
+    hiddenCards.delete(id);
+  } else {
+    hiddenCards.add(id);
+  }
+  localStorage.setItem('lb_hidden_cards', JSON.stringify([...hiddenCards]));
+  // Re-render the summary with current data
+  if (currentData) renderSummary(currentData.bdrTeam, currentData.pmTeam);
+}
+function makeSummaryCard(id, value, label, color, delay) {
+  const hidden = hiddenCards.has(id);
+  return `<div class="summary-card animate-in${hidden ? ' hidden-card' : ''}" style="animation-delay:${delay}s" data-card-id="${id}">
+    <button class="toggle-eye" onclick="toggleCard('${id}')" title="${hidden ? 'Show' : 'Hide'} ${label}">${hidden ? '👁️' : '🙈'}</button>
+    <div class="value" style="color:${color}">${value}</div>
+    <div class="label">${label}</div>
+  </div>`;
+}
 function renderSummary(bdr, pm) {
   const bL = bdr.reduce((s,m) => s+m.leads, 0);
   const bD = bdr.reduce((s,m) => s+m.deals, 0);
   const pA = pm.reduce((s,m) => s+m.assessments, 0);
   const pD = pm.reduce((s,m) => s+m.deals, 0);
   const pR = pA > 0 ? Math.round(pD/pA*100) : 0;
-  document.getElementById('summaryRow').innerHTML = `
-    <div class="summary-card animate-in" style="animation-delay:0.05s"><div class="value" style="color:var(--accent1)">${bL}</div><div class="label">BDR Leads</div></div>
-    <div class="summary-card animate-in" style="animation-delay:0.1s"><div class="value" style="color:var(--accent1)">${bD}</div><div class="label">BDR Deals</div></div>
-    <div class="summary-card animate-in" style="animation-delay:0.2s"><div class="value" style="color:var(--accent2)">${pA}</div><div class="label">PM Assessments</div></div>
-    <div class="summary-card animate-in" style="animation-delay:0.25s"><div class="value" style="color:var(--accent2)">${pD}</div><div class="label">PM Deals</div></div>
-    <div class="summary-card animate-in" style="animation-delay:0.3s"><div class="value" style="color:var(--accent2)">${pR}%</div><div class="label">PM Close Rate</div></div>
-  `;
+  document.getElementById('summaryRow').innerHTML =
+    makeSummaryCard('bdr-leads', bL, 'BDR Leads', 'var(--accent1)', 0.05) +
+    makeSummaryCard('bdr-deals', bD, 'BDR Deals', 'var(--accent1)', 0.1) +
+    makeSummaryCard('pm-assess', pA, 'PM Assessments', 'var(--accent2)', 0.2) +
+    makeSummaryCard('pm-deals', pD, 'PM Deals', 'var(--accent2)', 0.25) +
+    makeSummaryCard('pm-close-rate', pR + '%', 'PM Close Rate', 'var(--accent2)', 0.3);
 }
-
 function leaderRow(m, i, type, maxVal, isHouse) {
   const rank = i + 1;
   const rc = !isHouse && rank <= 3 ? `rank-${rank}` : '';
