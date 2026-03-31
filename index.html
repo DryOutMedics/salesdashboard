@@ -163,6 +163,17 @@ body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%;
         </div>
       </div>
       <div class="admin-section">
+        <h3>Stats Layout</h3>
+        <div class="admin-field">
+          <label>Stat Cards Per Row</label>
+          <select id="statsColumnsSelect">
+            <option value="2">2 per row (3 rows: BDR | BDR → PM | PM → Rate | Field)</option>
+            <option value="3">3 per row (2 rows)</option>
+            <option value="6">6 per row (1 row)</option>
+          </select>
+        </div>
+      </div>
+      <div class="admin-section">
         <h3>Team Photos</h3>
         <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:12px;">Click any avatar to upload a photo. Click "Remove" to clear.</p>
         <div class="photo-grid" id="photoGrid"></div>
@@ -281,7 +292,9 @@ function loadSettings() {
 }
 function saveSettings() {
   try {
-    localStorage.setItem('lb_settings', JSON.stringify({ sheetId: SPREADSHEET_ID, password: adminPassword, refreshInterval: autoRefreshSec, githubPAT }));
+    const statsColsVal = parseInt(document.getElementById('statsColumnsSelect')?.value || '2');
+    localStorage.setItem('lb_settings', JSON.stringify({ sheetId: SPREADSHEET_ID, password: adminPassword, refreshInterval: autoRefreshSec, githubPAT, statsColumns: statsColsVal }));
+    document.querySelector('.summary-row').style.gridTemplateColumns = 'repeat(' + statsColsVal + ', 1fr)';
   } catch(e) {}
 }
 async function savePhotos() {
@@ -611,6 +624,11 @@ function openAdmin() {
     document.getElementById('loginError').style.display = 'none';
     document.getElementById('adminPassInput').value = '';
     setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+    // Apply stats columns setting
+    const statsColsSetting = s.statsColumns || 2;
+    document.querySelector('.summary-row').style.gridTemplateColumns = 'repeat(' + statsColsSetting + ', 1fr)';
+    const sel = document.getElementById('statsColumnsSelect');
+    if (sel) sel.value = String(statsColsSetting);
   }
 }
 function closeAdmin() { document.getElementById('adminModal').classList.remove('show'); }
