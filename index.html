@@ -746,7 +746,7 @@ async function init(skipLoading) {
   try {
     const tabs = await fetchSheetTabs();
     if (tabs && tabs.length > 0) {
-      sheetTabs = tabs.filter(t => { const n = t.name.toLowerCase(); return n.includes('leaderboard') || n.includes('sales'); });
+      sheetTabs = tabs.filter(t => { const n = t.name.toLowerCase(); return n.includes('leaderboard') || n.includes('sales') || FALLBACK_TABS.some(ft => ft.name.toLowerCase() === n); });
       if (sheetTabs.length === 0) sheetTabs = tabs;
       setLiveStatus(true);
     } else throw new Error('No tabs');
