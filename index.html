@@ -495,7 +495,7 @@ function leaderRow(m, i, type, maxVal, isHouse) {
   if (type === 'bdr') {
     barW = maxVal > 0 ? (m.deals / maxVal) * 100 : 0;
     statB = m.deals; statU = 'deals';
-    sub = `${m.leads} leads`;
+    sub = `${m.leads} leads &middot; ${m.closeRate}% close`;
   } else if (type === 'field') {
     barW = maxVal > 0 ? (m.points / maxVal) * 100 : 0;
     statB = m.points; statU = 'pts';
@@ -722,16 +722,14 @@ function setLiveStatus(live) {
 
 // âââââââââââââââââââââââââââââââ FALLBACK DATA âââââââââââââââââââââââââââââââ
 const FALLBACK_TABS = [
-  { gid: '1907143927', name: 'April 26' },
   { gid: '1381274882', name: 'March 26' },
   { gid: '499280765', name: 'February 26' },
-  { gid: '691858394', name: 'January 26' },
+  { gid: '691858394', name: 'April 26' },
   { gid: '1151265052', name: 'December 25' },
   { gid: '1344481906', name: 'November 25' },
   { gid: '0', name: 'October Sales Leaderboard' },
 ];
 const FALLBACK_DATA = {
-  '1907143927': { bdrTeam: [{ name:'Ammar', leads:1, deals:0, closeRate:0 },{ name:'Arpi', leads:8, deals:5, closeRate:63 },{ name:'Gary', leads:1, deals:1, closeRate:100 },{ name:'House', leads:8, deals:4, closeRate:50 },{ name:'Jesús', leads:3, deals:3, closeRate:100 },{ name:'Jules', leads:1, deals:1, closeRate:100 },{ name:'Sarah', leads:1, deals:0, closeRate:0 },{ name:'Shara', leads:1, deals:0, closeRate:0 }], pmTeam: [{ name:'Tico', assessments:1, deals:1, closeRate:100 },{ name:'Gary', assessments:7, deals:6, closeRate:86 },{ name:'Olivia', assessments:3, deals:1, closeRate:33 },{ name:'Trevor', assessments:5, deals:3, closeRate:60 },{ name:'Jesús', assessments:2, deals:1, closeRate:50 },{ name:'Jack', assessments:3, deals:1, closeRate:33 },{ name:'Fernando', assessments:2, deals:1, closeRate:50 }], fieldTeam: [{ name:'Noah Thomas', points:11.5 },{ name:'Ross Johnson', points:9 },{ name:'Farid Nourmohammadi', points:9 },{ name:'Edward Santillan', points:8 },{ name:'Mario Knight', points:7 },{ name:'Arturo Mora', points:7 },{ name:'Austin Fry', points:4.5 },{ name:'Patrick Haynes', points:4 },{ name:'Garret Martines', points:3 },{ name:'Luis Basurto Mendieta', points:3 },{ name:'Andy McKnight', points:2 },{ name:'Samuel Calderon', points:1 },{ name:'Edgar Munoz', points:0 },{ name:'Juan Gonzalez', points:0 },{ name:'Jack Gaffney Harvey', points:0 },{ name:'David Alfekri', points:0 }] },
   '499280765': { bdrTeam: [{ name:'Arpi', leads:21, deals:10, closeRate:48 },{ name:'Gary', leads:5, deals:3, closeRate:60 },{ name:'Ammar', leads:1, deals:1, closeRate:100 },{ name:'Sofia', leads:4, deals:2, closeRate:50 },{ name:'Shara', leads:2, deals:1, closeRate:50 },{ name:'Demetrius', leads:0, deals:0, closeRate:0 },{ name:'JesÃºs', leads:0, deals:0, closeRate:0 },{ name:'Jules', leads:3, deals:3, closeRate:100 }], pmTeam: [{ name:'Fernando', assessments:11, deals:4, closeRate:36 },{ name:'Trevor', assessments:12, deals:5, closeRate:42 },{ name:'JesÃºs', assessments:10, deals:6, closeRate:60 },{ name:'Gary', assessments:13, deals:7, closeRate:54 },{ name:'Demetrius', assessments:3, deals:2, closeRate:67 },{ name:'David', assessments:7, deals:5, closeRate:71 },{ name:'Olivia', assessments:3, deals:3, closeRate:100 },{ name:'Mario', assessments:0, deals:0, closeRate:0 },{ name:'Jahan', assessments:0, deals:0, closeRate:0 },{ name:'Isaac', assessments:0, deals:0, closeRate:0 }] },
   '691858394': { bdrTeam: [{ name:'Arpi', leads:17, deals:9, closeRate:53 },{ name:'Gary', leads:9, deals:7, closeRate:78 },{ name:'Ammar', leads:6, deals:5, closeRate:83 },{ name:'Sofia', leads:7, deals:7, closeRate:100 },{ name:'Shara', leads:7, deals:4, closeRate:57 },{ name:'Demetrius', leads:5, deals:3, closeRate:60 },{ name:'Jesus', leads:4, deals:2, closeRate:50 },{ name:'Jules', leads:4, deals:3, closeRate:75 }], pmTeam: [{ name:'Fernando', assessments:18, deals:9, closeRate:50 },{ name:'Trevor', assessments:19, deals:14, closeRate:74 },{ name:'Jesus', assessments:8, deals:6, closeRate:75 },{ name:'Gary', assessments:16, deals:12, closeRate:75 },{ name:'Demetrius', assessments:18, deals:14, closeRate:78 },{ name:'David', assessments:3, deals:2, closeRate:67 },{ name:'Jahan', assessments:1, deals:1, closeRate:100 },{ name:'Isaac', assessments:4, deals:2, closeRate:50 }] },
   '1151265052': { bdrTeam: [{ name:'Arpi', leads:29, deals:20, closeRate:69 },{ name:'Sofia', leads:10, deals:4, closeRate:40 },{ name:'Demetrius', leads:8, deals:5, closeRate:63 },{ name:'Jules', leads:5, deals:1, closeRate:20 },{ name:'Ammar', leads:2, deals:2, closeRate:100 },{ name:'Gary', leads:14, deals:10, closeRate:71 }], pmTeam: [{ name:'Fernando', assessments:15, deals:11, closeRate:73 },{ name:'Trevor', assessments:17, deals:10, closeRate:59 },{ name:'Jesus', assessments:6, deals:3, closeRate:50 },{ name:'Gary', assessments:19, deals:12, closeRate:63 },{ name:'Demetrius', assessments:17, deals:9, closeRate:53 },{ name:'Mario', assessments:1, deals:1, closeRate:100 },{ name:'Jahan', assessments:1, deals:1, closeRate:100 },{ name:'Isaac', assessments:8, deals:6, closeRate:75 }] },
@@ -750,7 +748,7 @@ async function init(skipLoading) {
     if (tabs && tabs.length > 0) {
       sheetTabs = tabs.filter(t => { const n = t.name.toLowerCase(); return n.includes('leaderboard') || n.includes('sales') || FALLBACK_TABS.some(ft => ft.name.toLowerCase() === n); });
       if (sheetTabs.length === 0) sheetTabs = tabs;
-      if (!sheetTabs.find(t => t.gid === '1907143927')) sheetTabs.unshift({ gid: '1907143927', name: 'April 26' });
+      if (!sheetTabs.find(t => t.gid === '691858394')) sheetTabs.unshift({ gid: '691858394', name: 'April 26' });
       setLiveStatus(true);
     } else throw new Error('No tabs');
   } catch(e) {
