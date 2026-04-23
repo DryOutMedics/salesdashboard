@@ -24,7 +24,7 @@ body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%;
 .header { text-align: center; margin-bottom: 36px; }
 .header h1 { font-size: 2.4rem; font-weight: 900; letter-spacing: -1px; backgroud: linear-gradient(135deg, #ff6b6b, #ffd700, #6bffb8, #6bb5ff); background-size: 300% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientText 6s ease infinite; }
 @keyframes gradientText { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-.header .subtitle { color: var(--text-dim); font-size: 0.95rem; margin-top: 6px; }
+.header .subtitle { color: #ffffff; font-size: 1.6rem; font-weight: 800; margin-top: 4px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 20px rgba(255,255,255,0.4); }
 .header .live-badge { display: inline-block; margin-top: 8px; font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; background: rgba(107,255,184,0.12); color: var(--accent2); border: 1px solid rgba(107,255,184,0.25); }
 .header .live-badge.offline { background: rgba(255,107,107,0.12); color: var(--accent1); border-color: rgba(255,107,107,0.25); }
 .header .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); margin-right: 4px; animation: pulse 2s infinite; }
@@ -200,8 +200,8 @@ body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%;
 </div>
 <div class="container">
   <div class="header">
-    <h1>DRY OUT MEDICS</h1>
-    <p class="subtitle">Sales Team Leaderboard</p>
+    <img src="logo.png" alt="Dry Out Medics" style="max-height:90px; width:auto; margin-bottom:8px;">
+    <p class="subtitle">Sales Dashboard</p>
     <div class="live-badge" id="liveBadge"><span class="live-dot"></span> <span id="liveText">CONNECTING...</span></div>
   </div>
   <div class="error-banner" id="errorBanner">
