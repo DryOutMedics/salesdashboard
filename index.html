@@ -750,7 +750,7 @@ async function init(skipLoading) {
     if (tabs && tabs.length > 0) {
       sheetTabs = tabs.filter(t => { const n = t.name.toLowerCase(); return n.includes('leaderboard') || n.includes('sales') || FALLBACK_TABS.some(ft => ft.name.toLowerCase() === n); });
       if (sheetTabs.length === 0) sheetTabs = tabs;
-      sheetTabs = sheetTabs.filter(t => t.gid !== '1708336995'); sheetTabs.unshift({ gid: '1708336995', name: 'May 26' });
+      sheetTabs = sheetTabs.filter(t => t.gid !== '1708336995' && t.gid !== '1907143927'); sheetTabs.unshift({ gid: '1907143927', name: 'April 26' }); sheetTabs.unshift({ gid: '1708336995', name: 'May 26' });
       setLiveStatus(true);
     } else throw new Error('No tabs');
   } catch(e) {
