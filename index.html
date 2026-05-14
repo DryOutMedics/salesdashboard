@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dry Out Medics â Sales Leaderboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googlapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0f0f1a; --card: #1a1a2e; --card-hover: #22223a
@@ -723,7 +723,7 @@ function setLiveStatus(live) {
 // âââââââââââââââââââââââââââââââ FALLBACK DATA âââââââââââââââââââââââââââââââ
 const FALLBACK_TABS = [
   { gid: '1708336995', name: 'May 26' },
-  { gid: '1907143927', name: 'April 26' },
+  { gid: '577153417', name: 'April 26' },
   { gid: '1381274882', name: 'March 26' },
   { gid: '499280765', name: 'February 26' },
   { gid: '691858394', name: 'January 26' },
@@ -750,7 +750,7 @@ async function init(skipLoading) {
     if (tabs && tabs.length > 0) {
       sheetTabs = tabs.filter(t => { const n = t.name.toLowerCase(); return n.includes('leaderboard') || n.includes('sales') || FALLBACK_TABS.some(ft => ft.name.toLowerCase() === n); });
       if (sheetTabs.length === 0) sheetTabs = tabs;
-      sheetTabs = sheetTabs.filter(t => t.gid !== '1708336995' && t.gid !== '1907143927'); sheetTabs.unshift({ gid: '1907143927', name: 'April 26' }); sheetTabs.unshift({ gid: '1708336995', name: 'May 26' });
+      sheetTabs = sheetTabs.filter(t => t.gid !== '1708336995' && t.gid !== '577153417'); sheetTabs.unshift({ gid: '577153417', name: 'April 26' }); sheetTabs.unshift({ gid: '1708336995', name: 'May 26' });
       setLiveStatus(true);
     } else throw new Error('No tabs');
   } catch(e) {
