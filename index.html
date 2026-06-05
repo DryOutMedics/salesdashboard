@@ -16,7 +16,7 @@
   --gradient4: linear-gradient(135deg, #ff6bef, #d63384);
   --text: #f0f0f0; --text-dim: #8888aa; --border: #2a2a44;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; 
 body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 20% 50%, rgba(107,181,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(255,107,107,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(107,255,184,0.06) 0%, transparent 50%); animation: bgShift 20s ease-in-out infinite; z-index: 0; pointer-events: none; }
 @keyframes bgShift { 0%,100% { transform: translate(0,0); } 33% { transform: translate(-2%,1%); } 66% { transform: translate(2%,-1%); } }
@@ -722,7 +722,7 @@ function setLiveStatus(live) {
 
 // âââââââââââââââââââââââââââââââ FALLBACK DATA âââââââââââââââââââââââââââââââ
 const FALLBACK_TABS = [
-  { gid: '1708336995', name: 'May 26' },
+  { gid: '463093091', name: 'June 26' },	{ gid: '1708336995', name: 'May 26' },
   { gid: '577153417', name: 'April 26' },
   { gid: '1381274882', name: 'March 26' },
   { gid: '499280765', name: 'February 26' },
@@ -750,7 +750,7 @@ async function init(skipLoading) {
     if (tabs && tabs.length > 0) {
       sheetTabs = tabs.filter(t => { const n = t.name.toLowerCase(); return n.includes('leaderboard') || n.includes('sales') || FALLBACK_TABS.some(ft => ft.name.toLowerCase() === n); });
       if (sheetTabs.length === 0) sheetTabs = tabs;
-      sheetTabs = sheetTabs.filter(t => t.gid !== '1708336995' && t.gid !== '577153417'); sheetTabs.unshift({ gid: '577153417', name: 'April 26' }); sheetTabs.unshift({ gid: '1708336995', name: 'May 26' });
+      sheetTabs = sheetTabs.filter(t => t.gid !== '1708336995' && t.gid !== '577153417' && t.gid !== '463093091'); sheetTabs.unshift({ gid: '577153417', name: 'April 26' }); sheetTabs.unshift({ gid: '1708336995', name: 'May 26' }); sheetTabs.unshift({ gid: '463093091', name: 'June 26' }); sheetTabs.unshift({ gid: '463093091', name: 'June 26' });
       setLiveStatus(true);
     } else throw new Error('No tabs');
   } catch(e) {
