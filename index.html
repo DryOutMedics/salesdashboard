@@ -472,7 +472,7 @@ function renderSummary(bdr, pm, field) {
   const fP = field.reduce((s,m) => s+m.points, 0);
   document.getElementById('summaryRow').innerHTML =
     makeSummaryCard('bdr-leads', bL, 'BDR Leads', 'var(--accent1)', 0.05) +
-    makeSummaryCard('bdr-deals', bD, 'BDR Deals', 'var(--accent1)', 0.1) +
+    
     makeSummaryCard('pm-assess', pA, 'PM Assessments', 'var(--accent2)', 0.2) +
     makeSummaryCard('pm-deals', pD, 'PM Deals', 'var(--accent2)', 0.25) +
     makeSummaryCard('pm-close-rate', pR + '%', 'PM Close Rate', 'var(--accent2)', 0.3) +
@@ -721,7 +721,7 @@ function setLiveStatus(live) {
 }
 
 // âââââââââââââââââââââââââââââââ FALLBACK DATA âââââââââââââââââââââââââââââââ
-const FALLBACK_TABS = [
+const FALLBACK_TABS = [ { gid: '', name: 'July 26' },
   { gid: '463093091', name: 'June 26' },	{ gid: '1708336995', name: 'May 26' },
   { gid: '577153417', name: 'April 26' },
   { gid: '1381274882', name: 'March 26' },
