@@ -471,11 +471,9 @@ function renderSummary(bdr, pm, field) {
   const pR = pA > 0 ? Math.round(pD/pA*100) : 0;
   const fP = field.reduce((s,m) => s+m.points, 0);
   document.getElementById('summaryRow').innerHTML =
-    makeSummaryCard('bdr-leads', bL, 'BDR Leads', 'var(--accent1)', 0.05) +
-    
-    makeSummaryCard('pm-assess', pA, 'PM Assessments', 'var(--accent2)', 0.2) +
-    makeSummaryCard('pm-deals', pD, 'PM Deals', 'var(--accent2)', 0.25) +
-    makeSummaryCard('pm-close-rate', pR + '%', 'PM Close Rate', 'var(--accent2)', 0.3) +
+    makeSummaryCard('pm-assess', pA, 'Leads', 'var(--accent2)', 0.2) +
+    makeSummaryCard('pm-deals', pD, 'Deals', 'var(--accent2)', 0.25) +
+    makeSummaryCard('pm-close-rate', pR + '%', 'Close Rate', 'var(--accent2)', 0.3) +
     makeSummaryCard('field-points', fP, 'Field Points', 'var(--accent3)', 0.35);
 }
 function leaderRow(m, i, type, maxVal, isHouse) {
