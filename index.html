@@ -770,26 +770,30 @@ async function init(skipLoading) {
   document.getElementById('loading').classList.add('hidden');
   startAutoRefresh();
 }
-async function loadMonth(gid, useFallback) {
-  const eb = document.getElementById('errorBanner');
-  eb.classList.remove('show');
-  try {
-    const raw = await fetchTabData(gid);
-    const data = parseSheetData(raw);
-    if (data.bdrTeam.length > 0 || data.pmTeam.length > 0) { currentData = data; setLiveStatus(true); }
-    else if (FALLBACK_DATA[gid]) { currentData = FALLBACK_DATA[gid]; setLiveStatus(false); }
-    renderSummary(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
-    renderTeams(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
-  } catch(e) {
-    console.error('Load error:', e);
-    if (FALLBACK_DATA[gid]) {
-      currentData = FALLBACK_DATA[gid];
-      renderSummary(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
-      renderTeams(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
-      setLiveStatus(false);
-    } else { eb.classList.add('show'); }
+let latestRequestedGid = null;
+  async function loadMonth(gid, useFallback) {
+      latestRequestedGid = gid;
+      const eb = document.getElementById('errorBanner');
+      eb.classList.remove('show');
+      try {
+            const raw = await fetchTabData(gid);
+            if (gid !== latestRequestedGid) return;
+            const data = parseSheetData(raw);
+            if (data.bdrTeam.length > 0 || data.pmTeam.length > 0) { currentData = data; setLiveStatus(true); }
+            else if (FALLBACK_DATA[gid]) { currentData = FALLBACK_DATA[gid]; setLiveStatus(false); }
+            renderSummary(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
+            renderTeams(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
+      } catch(e) {
+            console.error('Load error:', e);
+            if (gid !== latestRequestedGid) return;
+            if (FALLBACK_DATA[gid]) {
+                    currentData = FALLBACK_DATA[gid];
+                    renderSummary(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
+                    renderTeams(currentData.bdrTeam, currentData.pmTeam, currentData.fieldTeam);
+                    setLiveStatus(false);
+            } else { eb.classList.add('show'); }
+      }
   }
-}
 async function refreshData() {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
