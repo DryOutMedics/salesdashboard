@@ -1145,5 +1145,27 @@ init();
   });
 })();
 </script>
+
+<script>
+/* Auto-select the current month on load */
+(function(){
+  var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var tries=0;
+  var timer=setInterval(function(){
+    var s=document.getElementById('monthSelect');
+    if(s&&s.options.length){
+      var dt=new Date(), want=MN[dt.getMonth()]+' '+String(dt.getFullYear()).slice(2);
+      for(var i=0;i<s.options.length;i++){
+        if(s.options[i].textContent.trim()===want){
+          if(s.selectedIndex!==i){ s.selectedIndex=i; s.dispatchEvent(new Event('change',{bubbles:true})); }
+          break;
+        }
+      }
+      clearInterval(timer);
+    }
+    if(++tries>40) clearInterval(timer);
+  },250);
+})();
+</script>
 </body>
 </html>
