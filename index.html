@@ -426,7 +426,8 @@ function rankField(team) {
     .sort((a, b) => b.points - a.points);
 }
 function rankPM(team) {
-  const active = team.filter(m => !isHouseAccount(m.name) && m.assessments > 0 && m.deals > 0);
+  // Anyone with assessments is active — a PM with 0 deals still ranks (at the bottom), rather than vanishing.
+  const active = team.filter(m => !isHouseAccount(m.name) && m.assessments > 0);
   if (!active.length) return [];
   const totA = active.reduce((s,m) => s + m.assessments, 0);
   const totD = active.reduce((s,m) => s + m.deals, 0);
